@@ -1,4 +1,5 @@
-﻿using GymSystem.BLL.Services.Interfaces;
+﻿using AutoMapper;
+using GymSystem.BLL.Services.Interfaces;
 using GymSystem.BLL.ViewModels.PlanViewModels;
 using GymSystem.DAL.Models;
 using GymSystem.DAL.Repositries.Interfaces;
@@ -11,25 +12,19 @@ namespace GymSystem.BLL.Services.Classes
     public class PlanService : IPlanService
     {
         private readonly IUnitOfWork _iUnitOfWork;
+        private readonly IMapper _mapper;
 
-        public PlanService( IUnitOfWork iUnitOfWork) 
+        public PlanService( IUnitOfWork iUnitOfWork, IMapper mapper) 
         {
             _iUnitOfWork = iUnitOfWork;
+            _mapper = mapper;
         }
         public async Task<IEnumerable<PlanViewModel>> GetAllPlansAsync(CancellationToken ct = default)
         {
             var plans = await _iUnitOfWork.GetRepository<Plan>().GetAllAsync(ct: ct);
             if (plans is null)
                 return [];
-            return plans.Select(p => new PlanViewModel
-            {
-                Id = p.Id,
-                Name = p.Name,
-                Description = p.Description,
-                DurationDays = p.DurationDays,
-                Price = p.Price,
-                IsActive = p.IsActive,
-            });
+            return _mapper.Map<IEnumerable<PlanViewModel>>(plans);
 
         }
 
@@ -38,15 +33,7 @@ namespace GymSystem.BLL.Services.Classes
             var plan = await _iUnitOfWork.GetRepository<Plan>().GetByIdAsync(Id, ct);
             if (plan is null)
                 return null;
-            var planModel = new PlanViewModel
-            {
-                Id = plan.Id,
-                Name = plan.Name,
-                Description = plan.Description,
-                DurationDays = plan.DurationDays,
-                Price = plan.Price,
-                IsActive = plan.IsActive
-            };
+            var planModel = _mapper.Map<PlanViewModel>(plan);
             return planModel;
 
         }
@@ -60,15 +47,7 @@ namespace GymSystem.BLL.Services.Classes
             var plan = await _iUnitOfWork.GetRepository<Plan>().GetByIdAsync(Id, ct);
             if (plan is null || !plan.IsActive) return null;
             if(await HasActiveMembershipsAsync(Id , ct)) return null;
-            return new UpdatePlanViewModel
-            {
-
-                PlanName = plan.Name,
-                Description = plan.Description,
-                DurationDays = plan.DurationDays,
-                Price = plan.Price,
-
-            };
+            return _mapper.Map<UpdatePlanViewModel>(plan);
 
         }
 

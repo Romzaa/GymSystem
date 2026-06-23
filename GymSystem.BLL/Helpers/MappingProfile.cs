@@ -1,0 +1,84 @@
+﻿using AutoMapper;
+using GymSystem.BLL.ViewModels.MemberViewModels;
+using GymSystem.BLL.ViewModels.PlanViewModels;
+using GymSystem.BLL.ViewModels.SessionViewModels;
+using GymSystem.DAL.Models;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace GymSystem.BLL.Helpers
+{
+    public class MappingProfile : Profile
+    {
+        public MappingProfile()
+        {
+            MapMember();
+            MapPlan();
+            MapSession();
+        }
+
+        private void MapMember()
+        {
+            CreateMap<CreateMemberViewModel, Member>()
+                                .ForMember(des => des.Address, opt => opt.MapFrom(src => new Address
+                                {
+                                    BuildingNumber = src.BuildingNumber,
+                                    Street = src.Street,
+                                    City = src.City
+                                }))
+                                .ForMember(des => des.HealthRecord, opt => opt.MapFrom(src => src.HealthRecordViewModel));
+
+            CreateMap<HealthRecordViewModel, HealthRecord>().ReverseMap();
+
+            CreateMap<Member, MemberViewModel>()
+                .ForMember(des => des.Gender, opt => opt.MapFrom(src => src.Gender.ToString()))
+                .ForMember(des => des.DateOfBirth, opt => opt.MapFrom(src => src.DateOfBirth.ToShortDateString()))
+                .ForMember(des => des.Address, opt => opt.MapFrom(src => $"{src.Address.BuildingNumber} - {src.Address.Street} - {src.Address.City}"));
+
+            CreateMap<Member, UpdateMemberViewModel>()
+                .ForMember(des => des.BuildingNumber, opt => opt.MapFrom(src => src.Address.BuildingNumber))
+                .ForMember(des => des.Street, opt => opt.MapFrom(src => src.Address.Street))
+                .ForMember(des => des.City, opt => opt.MapFrom(src => src.Address.City));
+
+            CreateMap<UpdateMemberViewModel, Member>()
+                .ForMember(des => des.Name, opt => opt.Ignore())
+                .ForMember(des => des.Photo, opt => opt.Ignore())
+                .AfterMap((src, des) =>
+                {
+                    des.Address = new Address();
+                    des.Address.BuildingNumber = src.BuildingNumber;
+                    des.Address.Street = src.Street;
+                    des.Address.City = src.City;
+                    des.UpdatedAt = DateTime.Now;
+                });
+        }
+
+        private void MapPlan() 
+        {
+            CreateMap<Plan, PlanViewModel>().ReverseMap();
+
+            CreateMap<Plan, UpdatePlanViewModel>().ForMember(des => des.PlanName, opt => opt.MapFrom(src => src.Name));
+            CreateMap<UpdatePlanViewModel, Plan>().ForMember(des => des.Name, opt => opt.MapFrom(src => src.PlanName));
+        }
+
+        private void MapSession()
+        {
+            CreateMap<Session, SessionViewModel>()
+                .ForMember(des => des.TrainerName, opt => opt.MapFrom(src => src.Trainer.Name))
+                .ForMember(des => des.CategoryName, opt => opt.MapFrom(src => src.Category.Name));
+
+            CreateMap<Session, UpdateSessionViewModel>();
+            CreateMap<UpdateSessionViewModel, Session>()
+                .ForMember(des => des.Id, opt => opt.Ignore())
+                .ForMember(des => des.Capacity, opt => opt.Ignore())
+                .ForMember(des => des.CategoryId, opt => opt.Ignore())
+                .ForMember(des => des.AvailableSlots, opt => opt.Ignore());
+
+            CreateMap<CreateSessionViewModel, Session>()
+                .ForMember(des => des.Id, opt => opt.Ignore())
+                .ForMember(des => des.AvailableSlots, opt => opt.Ignore());
+
+        }
+    }
+}

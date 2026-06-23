@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace GymSystem.DAL.Models
@@ -18,6 +19,7 @@ namespace GymSystem.DAL.Models
         public int TrainerId { get; set; }
         public ICollection<Booking> Bookings { get; set; } = [];
 
+        [NotMapped]
         public int AvailableSlots => Capacity - (Bookings?.Count?? 0) ;
         
     }

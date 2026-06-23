@@ -41,6 +41,40 @@ namespace GymSystem.PL.Controllers
             }
             return View(healthRecord);
         }
+       
+        
+        #region Create
+
+        // Create - Display => GET
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        // Create - Action => POST
+        [HttpPost]
+        public async Task<IActionResult> Create(CreateMemberViewModel viewModel, CancellationToken ct)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(viewModel);
+            }
+            var result = await _memberService.CreateMemberAsync(viewModel, ct);
+
+            if (result)
+            {
+                TempData["SuccessMessage"] = "Member created successfully.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Failed to create member. Please try again.";
+            }
+
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        #endregion
 
         #region Edit
 
@@ -74,39 +108,6 @@ namespace GymSystem.PL.Controllers
             TempData["SuccessMessage"] = "Member Updated Successfully";
             return RedirectToAction(nameof(Index));
         }
-        #endregion
-
-        #region Create
-
-        // Create - Display => GET
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // Create - Action => POST
-        [HttpPost]
-        public async Task<IActionResult> Create(CreateMemberViewModel viewModel, CancellationToken ct)
-        {
-            if(!ModelState.IsValid)
-            {
-                return View(viewModel);
-            }
-            var result = await _memberService.CreateMemberAsync(viewModel, ct);
-
-            if (result)
-            {
-                TempData["SuccessMessage"] = "Member created successfully.";
-            }
-            else
-            {
-                TempData["ErrorMessage"] = "Failed to create member. Please try again.";
-            }
-
-
-                return RedirectToAction(nameof(Index));
-        }
-
         #endregion
 
         #region Delete

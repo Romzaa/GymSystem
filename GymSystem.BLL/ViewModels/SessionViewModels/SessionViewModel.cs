@@ -19,16 +19,16 @@ namespace GymSystem.BLL.ViewModels.SessionViewModels
         public int AvailableSlots { get; set; }
 
         // Computed properties
-        public string DateDisplay => $"{StartDate:MMM dd , yyyy}";
-        public string TimeRangeDisplay => $"{StartDate:hh:mm tt} - {EndDate:hh:mm tt}";
-        public TimeSpan Duration => EndDate - StartDate;
+        public string DateDisplay => $"{StartTime:MMM dd , yyyy}";
+        public string TimeRangeDisplay => $"{StartTime:hh:mm tt} - {EndTime:hh:mm tt}";
+        public TimeSpan Duration => EndTime - StartTime;
         public string Status
         {
             get
             {
-                if (StartDate > DateTime.Now)
+                if (StartTime > DateTime.Now)
                     return "Upcoming";
-                else if (StartDate <= DateTime.Now && EndDate >= DateTime.Now)
+                else if (StartTime <= DateTime.Now && EndTime >= DateTime.Now)
                     return "Ongoing";
                 else
                     return "Completed";
