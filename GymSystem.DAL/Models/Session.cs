@@ -16,6 +16,9 @@ namespace GymSystem.DAL.Models
         public int CategoryId { get; set; }
         public Trainer Trainer { get; set; } = default!;
         public int TrainerId { get; set; }
-        public ICollection<Booking> Bookings { get; set; } = default!;
+        public ICollection<Booking> Bookings { get; set; } = [];
+
+        public int AvailableSlots => Capacity - (Bookings?.Count?? 0) ;
+        
     }
 }

@@ -17,7 +17,12 @@ namespace GymSystem.PL
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IMemberService, MemberService >();
+            builder.Services.AddScoped<IPlanService , PlanService > ();
+            builder.Services.AddScoped<ITrainerService , TrainerService >();
+            builder.Services.AddScoped<ISessionService, SessionService >();
+            builder.Services.AddScoped<ISessionRepository, SessionRepository>();
             builder.Services.AddDbContext<GymDbContext>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));

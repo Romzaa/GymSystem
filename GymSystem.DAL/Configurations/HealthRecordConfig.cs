@@ -7,7 +7,7 @@ using System.Text;
 
 namespace GymSystem.DAL.Configurations
 {
-    internal class HealthRecordConfig : IEntityTypeConfiguration<HealthRecord>
+    internal class HealthRecordConfig : IEntityTypeConfiguration<HealthRecord> 
     {
         public void Configure(EntityTypeBuilder<HealthRecord> builder)
         {

@@ -31,21 +31,18 @@ namespace GymSystem.DAL.Repositries.Classes
             var Entity = _dbSet.FindAsync(id, ct);
             return await Entity;
         }
-        public async Task<int> AddAsync(T Entity, CancellationToken ct = default)
+        public void AddAsync(T Entity)
         {
             _dbSet.Add(Entity);
-            return await _dbcontext.SaveChangesAsync(ct);
         }
 
-        public async Task<int> UpdateAsync(T Entity, CancellationToken ct = default)
+        public void UpdateAsync(T Entity)
         {
             _dbSet.Update(Entity);
-            return await _dbcontext.SaveChangesAsync(ct);
         }
-        public async Task<int> DeleteAsync(T Entity, CancellationToken ct = default)
+        public void DeleteAsync(T Entity)
         {
             _dbSet.Remove(Entity);
-            return await _dbcontext.SaveChangesAsync(ct);
         }
 
 
@@ -53,6 +50,13 @@ namespace GymSystem.DAL.Repositries.Classes
         {
             return await _dbSet.AnyAsync(predicate, ct);
 
+        }
+
+        public async Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate, bool tracking = false, CancellationToken ct = default)
+        {
+            var result = tracking ? _dbSet.FirstOrDefaultAsync(predicate, ct) : _dbSet.AsNoTracking().FirstOrDefaultAsync(predicate, ct);
+           
+            return await result;
         }
     }
 }

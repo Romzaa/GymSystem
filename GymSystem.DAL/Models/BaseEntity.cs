@@ -6,6 +6,10 @@ namespace GymSystem.DAL.Models
 {
     public abstract class BaseEntity
     {
+        protected BaseEntity()
+        {
+            
+        }
         public DateTime UpdatedAt { get; set; }
     }
 }

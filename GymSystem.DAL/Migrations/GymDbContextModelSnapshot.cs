@@ -128,6 +128,9 @@ namespace GymSystem.DAL.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<decimal>("Weight")
                         .HasPrecision(5, 2)
                         .HasColumnType("decimal(5,2)");
@@ -205,8 +208,8 @@ namespace GymSystem.DAL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateOnly>("EndDate")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("MemberId")
                         .HasColumnType("int");
@@ -214,10 +217,13 @@ namespace GymSystem.DAL.Migrations
                     b.Property<int>("PlanId")
                         .HasColumnType("int");
 
-                    b.Property<DateOnly>("StartDate")
+                    b.Property<DateTime>("StartDate")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("date")
+                        .HasColumnType("datetime2")
                         .HasDefaultValueSql("GetDate()");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -368,8 +374,13 @@ namespace GymSystem.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("Specialities")
-                        .HasColumnType("int");
+                    b.Property<string>("Photo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Specialities")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -386,7 +397,7 @@ namespace GymSystem.DAL.Migrations
                         {
                             t.HasCheckConstraint("CK_Trainer_Email", "Email LIKE '%@%.%'");
 
-                            t.HasCheckConstraint("CK_Trainer_Phone", "Phone Like '01[0125][0-9][0-9][0-9][0-9][0-9][0-9]'");
+                            t.HasCheckConstraint("CK_Trainer_Phone", "Phone Like '01[0125][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'");
                         });
                 });
 

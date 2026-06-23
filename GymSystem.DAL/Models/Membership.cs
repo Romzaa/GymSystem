@@ -5,11 +5,11 @@ using System.Text;
 
 namespace GymSystem.DAL.Models
 {
-    public class Membership
+    public class Membership : BaseEntity
     {
         public int Id { get; set; }
-        public DateOnly StartDate { get; set; }
-        public DateOnly EndDate { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
 
         public string Status => EndDate > StartDate ? "Active" : "Expired";
         public bool IsActive => EndDate > StartDate;

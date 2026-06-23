@@ -23,11 +23,14 @@ namespace GymSystem.DAL.Configurations
             builder.Property(m => m.Gender)
                 .HasConversion<string>().HasMaxLength(10);
 
+            builder.Property(m => m.Specialities)
+                .HasConversion<string>().HasMaxLength(20);
+
 
             builder.ToTable( m =>
             {
                 m.HasCheckConstraint("CK_Trainer_Email", "Email LIKE '%@%.%'");
-                m.HasCheckConstraint("CK_Trainer_Phone", "Phone Like '01[0125][0-9][0-9][0-9][0-9][0-9][0-9]'");
+                m.HasCheckConstraint("CK_Trainer_Phone", "Phone Like '01[0125][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'");
             });
 
             builder.OwnsOne(t => t.Address, a =>

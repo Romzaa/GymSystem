@@ -5,7 +5,7 @@ using System.Text;
 
 namespace GymSystem.DAL.Models
 {
-    public class HealthRecord
+    public class HealthRecord : BaseEntity
     {
         public int Id { get; set; }
         public string? Note { get; set; }
