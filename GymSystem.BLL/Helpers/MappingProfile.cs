@@ -2,6 +2,7 @@
 using GymSystem.BLL.ViewModels.MemberViewModels;
 using GymSystem.BLL.ViewModels.PlanViewModels;
 using GymSystem.BLL.ViewModels.SessionViewModels;
+using GymSystem.BLL.ViewModels.TrainerViewModels;
 using GymSystem.DAL.Models;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,7 @@ namespace GymSystem.BLL.Helpers
             MapMember();
             MapPlan();
             MapSession();
+            MapTrainer();
         }
 
         private void MapMember()
@@ -79,6 +81,29 @@ namespace GymSystem.BLL.Helpers
                 .ForMember(des => des.Id, opt => opt.Ignore())
                 .ForMember(des => des.AvailableSlots, opt => opt.Ignore());
 
+        }
+        private void MapTrainer()
+        {
+            CreateMap<CreateTrainerViewModel, Trainer>()
+                .ForMember(des => des.Address, opt => opt.MapFrom(src => new Address()
+                {
+                    BuildingNumber = src.BuildingNumber,
+                    Street = src.Street,
+                    City = src.City
+                }));
+
+
+            CreateMap<Trainer, TrainerViewModel>()
+                .ForMember(des => des.Address, opt => opt.MapFrom(src => $"{src.Address.BuildingNumber} - {src.Address.Street} - {src.Address.City}"))
+                .ForMember(des => des.DateOfBirth, opt => opt.MapFrom(src => src.DateOfBirth.ToShortDateString()));
+
+            CreateMap<Trainer, UpdateTrainerViewModel>()
+                .AfterMap((src, des) =>
+                {
+                    des.BuildingNumber = src.Address.BuildingNumber;
+                    des.Street = src.Address.Street;
+                    des.City = src.Address.City;
+                });
         }
     }
 }

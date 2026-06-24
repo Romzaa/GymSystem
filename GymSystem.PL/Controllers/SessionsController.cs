@@ -30,7 +30,7 @@ namespace GymSystem.PL.Controllers
             var session = await _sessionService.GetSessionDetailsAsync(Id,ct);
             if(session is null)
             {
-                TempData["ErrorMessage"] = "ErrorMessage";
+                TempData["ErrorMessage"] = "Session Is Not Found";
                 return RedirectToAction(nameof(Index));
             }
             return View(session);
@@ -54,13 +54,24 @@ namespace GymSystem.PL.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreateSessionViewModel model ,CancellationToken ct = default)
         {
+            var Trainers = await _sessionService.GetAllTrainers(ct);
+            ViewBag.Trainers = Trainers.Select(t => new SelectListItem
+            {
+                Value = t.Id.ToString(),
+                Text = t.Name
+            }).ToList();
+
             if (!ModelState.IsValid)
             {
                 TempData["ErrorMessage"] = "Couldn't Create New Session";
                 return RedirectToAction(nameof(Index));
             }
             var result = await _sessionService.CreateSessionAsync(model, ct);
-
+            if(!result.success)
+            {
+                TempData["ErrorMessage"] = result.errorMessage;
+                return View(model);
+            }
             TempData["SuccessMessage"] = "Session Is Created Successfully";
             return RedirectToAction(nameof(Index));
         }
@@ -105,9 +116,9 @@ namespace GymSystem.PL.Controllers
                 return View(model);
             }
             var result = await _sessionService.UpdateSessionAsync(Id, model, ct);
-            if (result == false)
+            if (!result.success)
             {
-                TempData["ErrorMessage"] = "Failed To Update Session";
+                TempData["ErrorMessage"] = result.errorMessage;
                 return View(model);
 
             }else
@@ -138,9 +149,9 @@ namespace GymSystem.PL.Controllers
         public async Task<IActionResult> DeleteConfirmed(int Id , CancellationToken ct =default) 
         {
             var result = await _sessionService.RemoveSessionAsync(Id, ct);
-            if (result == false)
+            if (!result.success)
             {
-                TempData["ErrorMessage"] = "Failed To Delete Session ";
+                TempData["ErrorMessage"] = result.errorMessage;
                 return RedirectToAction(nameof(Index));
             }
             TempData["SuccessMessage"] = "Session Is Deleted Successfully";

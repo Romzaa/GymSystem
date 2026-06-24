@@ -1,4 +1,5 @@
-﻿using GymSystem.BLL.Services.Interfaces;
+﻿using AutoMapper;
+using GymSystem.BLL.Services.Interfaces;
 using GymSystem.BLL.ViewModels.TrainerViewModels;
 using GymSystem.DAL.Models;
 using GymSystem.DAL.Repositries.Interfaces;
@@ -12,10 +13,12 @@ namespace GymSystem.BLL.Services.Classes
     public class TrainerService : ITrainerService
     {
         private readonly IUnitOfWork _iUnitOfWork;
+        private readonly IMapper _mapper;
 
-        public TrainerService(IUnitOfWork iUnitOfWork) 
+        public TrainerService(IUnitOfWork iUnitOfWork, IMapper mapper) 
         {
             _iUnitOfWork = iUnitOfWork;
+            _mapper = mapper;
         }
         public async Task<bool> CreateTrainerAsync(CreateTrainerViewModel viewModel, CancellationToken ct = default)
         {
@@ -26,23 +29,7 @@ namespace GymSystem.BLL.Services.Classes
 
             if (emailExists || phoneExists)
                 return false;
-            var trainer = new Trainer
-            {
-
-                Name = viewModel.Name,
-                Email = viewModel.Email,
-                Phone = viewModel.Phone,
-                Gender = viewModel.Gender,
-                DateOfBirth = viewModel.DateOfBirth,
-                Specialities = viewModel.Specialities,
-                Address = new Address
-                {
-                    BuildingNumber = viewModel.BuildingNumber,
-                    City = viewModel.City,
-                    Street = viewModel.Street
-                }
-
-            };
+            var trainer =  _mapper.Map<Trainer>(viewModel);
             trainerRepo.AddAsync(trainer);
             var result = await _iUnitOfWork.SaveChangesAsync(ct);
             return result > 0;
@@ -52,56 +39,22 @@ namespace GymSystem.BLL.Services.Classes
         {
             var trainers = await _iUnitOfWork.GetRepository<Trainer>().GetAllAsync(ct: ct);
             if (!trainers.Any()) return [];
-            return trainers.Select(t => new TrainerViewModel
-            {
-                Id = t.Id,
-                Name = t.Name,
-                Email = t.Email,
-                Phone = t.Phone,
-                Photo = t.Photo,
-                Gender = t.Gender,
-                Address = $"{t.Address.BuildingNumber} - {t.Address.Street} - {t.Address.City}",
-                Specialities = t.Specialities
-            });
+            return _mapper.Map<IEnumerable<TrainerViewModel>>(trainers);
         }
 
         public async Task<TrainerViewModel?> GetTrainerDetailsAsync(int Id, CancellationToken ct = default)
         {
             var trainer = await _iUnitOfWork.GetRepository<Trainer>().GetByIdAsync(Id , ct);
             if(trainer is null) return null;
-            return new TrainerViewModel
-            {
-                Id = trainer.Id,
-                Name = trainer.Name,
-                Email = trainer.Email,
-                Gender = trainer.Gender,
-                Photo = trainer.Photo,
-                Phone = trainer.Phone,
-                DateOfBirth = trainer.DateOfBirth.ToShortDateString(),
-                Specialities = trainer.Specialities,
-                Address = $"{trainer.Address.BuildingNumber} - {trainer.Address.Street} - {trainer.Address.City}"
+            return _mapper.Map<TrainerViewModel>(trainer);
 
-            };
-
-
-        
         }
 
         public async Task<UpdateTrainerViewModel?> GetTrainerToUpdateAsync(int Id, CancellationToken ct = default)
         {
             var trainer = await _iUnitOfWork.GetRepository<Trainer>().GetByIdAsync(Id, ct);
             if (trainer is null) return null;
-            var trainerViewModel = new UpdateTrainerViewModel
-            {
-                Name = trainer.Name,
-                Email = trainer.Email,
-                Phone = trainer.Phone,
-                Specialities = trainer.Specialities,
-                BuildingNumber = trainer.Address.BuildingNumber,
-                Street = trainer.Address.Street,
-                City = trainer.Address.City
-
-            };
+            var trainerViewModel = _mapper.Map< UpdateTrainerViewModel>(trainer);
             return trainerViewModel;
         }
         public async Task<bool> UpdateTrainerAsync(int Id, UpdateTrainerViewModel model, CancellationToken ct = default)
