@@ -43,18 +43,20 @@ namespace GymSystem.BLL.Services.Classes
             var trainerRepo = _iUnitOfWork.GetRepository<Trainer>();
             var trainer = await trainerRepo.GetByIdAsync(model.TrainerId);
             if (model is null) return Result.NotFound();
-            if(model.StartTime < model.EndTime) return Result.Validation("Error!! End-Date Must Be After Start-Date");
+            if(model.StartTime > model.EndTime) return Result.Validation("Error!! End-Date Must Be After Start-Date");
             if( model.StartTime < DateTime.Now ) return Result.Validation("Error!! Start-Date Must Be In The Future");
             if (trainer is null) return Result.NotFound("Trainer Is Not Found");
             if( await _iUnitOfWork.SessionRepository.AnyAsync(
                     s => (
                     s.Trainer.Id == model.TrainerId && 
             (
-            (s.StartTime >= model.StartTime && s.EndTime <= model.EndTime) ||
-            (s.StartTime <= model.StartTime && s.EndTime >= model.EndTime) 
+            (model.StartTime >= s.StartTime && model.StartTime <= s.EndTime) ||
+            (model.StartTime <= s.StartTime && model.EndTime >= s.EndTime) ||
+            (model.StartTime >= s.StartTime && model.EndTime <= s.EndTime ) ||
+            (model.EndTime >= s.StartTime && model.EndTime <= s.EndTime)
             ) 
             ), ct
-            ) ) return Result.Validation("Can't Book A Session For Same Trainer At Same Time !!");
+            ) ) return Result.Validation("The Trainer Has A Session At The Same Time !!");
 
             var categoryRepo = _iUnitOfWork.GetRepository<Category>();
             var category = await categoryRepo.GetByIdAsync(model.CategoryId);
@@ -75,14 +77,34 @@ namespace GymSystem.BLL.Services.Classes
         }
         public async Task<Result> UpdateSessionAsync(int Id, UpdateSessionViewModel model, CancellationToken ct = default)
         {
-            var session = await _iUnitOfWork.GetRepository<Session>().GetByIdAsync(Id, ct);
+            var session = await _iUnitOfWork.SessionRepository.GetSessionwithTrainerandCategoryByIdAsync(Id,ct);
             var bookings = await _iUnitOfWork.GetRepository<Booking>().AnyAsync(b => b.SessionId == Id && b.BookingDate > DateTime.Now, ct);
-            if (session is null || bookings) return Result.Validation("Can't Update Session That Already Booked");
-            session.Description = model.Description;
-            session.StartTime = model.StartTime;
-            session.EndTime = model.EndTime;
-            session.TrainerId = model.TrainerId;
+            if(session is null ) return Result.NotFound("Session Is Not Found");
+            if (session.StartTime <= DateTime.Now && session.EndTime > DateTime.Now) return Result.Validation("Can't Update Completed or Ongoing Session");
+            if (bookings) return Result.Validation("Can't Update Session That Already Booked");
+            if (model.StartTime > model.EndTime) return Result.Validation("Error!! End-Date Must Be After Start-Date");
+            if (model.StartTime < DateTime.Now) return Result.Validation("Error!! Start-Date Must Be In The Future");
 
+            if (await _iUnitOfWork.SessionRepository.AnyAsync(
+                        s => (
+                        s.Trainer.Id == model.TrainerId &&
+                (
+                (model.StartTime >= s.StartTime && model.StartTime <= s.EndTime) ||
+                (model.StartTime <= s.StartTime && model.EndTime >= s.EndTime) ||
+                (model.StartTime >= s.StartTime && model.EndTime <= s.EndTime) ||
+                (model.EndTime >= s.StartTime && model.EndTime <= s.EndTime)
+                )
+                ), ct
+                )) return Result.Validation("The Trainer Has A Session At The Same Time !!");
+
+            var trainerRepo = _iUnitOfWork.GetRepository<Trainer>();
+            var trainer = await trainerRepo.GetByIdAsync(model.TrainerId);
+            if (trainer is null) return Result.NotFound("Trainer Is Not Found");
+            if (trainer.Specialities != session.Category.Name) return Result.Validation("Trainer Speciality Must Be Like Training Type");
+
+
+            _Mapper.Map(model, session);
+            session.UpdatedAt = DateTime.Now;
             var result = await _iUnitOfWork.SaveChangesAsync(ct);
             return result > 0 ? Result.OK() : Result.Fail("Failed To Update Session");
         }

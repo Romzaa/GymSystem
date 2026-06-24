@@ -70,9 +70,9 @@ namespace GymSystem.PL.Controllers
 
             }
             var result = await _planService.UpdatePlanAsync(Id, model, ct);
-            if(result == false)
+            if(!result.success)
             {
-                TempData["ErrorMessage"] = "Failed To Update Plan";
+                TempData["ErrorMessage"] = result.errorMessage;
             }
             else
             {

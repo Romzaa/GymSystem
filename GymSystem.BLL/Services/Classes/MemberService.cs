@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using GymSystem.BLL.Helpers;
 using GymSystem.BLL.Services.Interfaces;
 using GymSystem.BLL.ViewModels.MemberViewModels;
 using GymSystem.DAL;
@@ -22,18 +23,21 @@ namespace GymSystem.BLL.Services.Classes
             _mapper = mapper;
         }
 
-        public async Task<bool> CreateMemberAsync(CreateMemberViewModel viewModel, CancellationToken ct = default)
+        public async Task<Result> CreateMemberAsync(CreateMemberViewModel viewModel, CancellationToken ct = default)
         {
             var memberRepo =  _iUnitOfWork.GetRepository<Member>();
 
             var emailExists =await memberRepo.AnyAsync(m => m.Email == viewModel.Email, ct);
             var phoneExists =await memberRepo.AnyAsync(m => m.Phone == viewModel.Phone, ct);
-            if (emailExists || phoneExists)
-                return false;
+            if (emailExists )
+                return Result.Validation("This Email Already Exists");
+            if(phoneExists)
+                return Result.Validation("This Phone Number Already Exists");
+
             var member = _mapper.Map<Member>(viewModel);
              memberRepo.AddAsync(member);
             var result = await _iUnitOfWork.SaveChangesAsync(ct);
-            return result > 0;
+            return result > 0 ? Result.OK() : Result.Fail("Failed To Create New Member");
             
             }
 
@@ -102,20 +106,21 @@ namespace GymSystem.BLL.Services.Classes
             return _mapper.Map<UpdateMemberViewModel>(member);
     }
 
-        public async Task<bool> UpdateMemberAsync(int Id, UpdateMemberViewModel model, CancellationToken ct = default)
+        public async Task<Result> UpdateMemberAsync(int Id, UpdateMemberViewModel model, CancellationToken ct = default)
         {
             var member = await _iUnitOfWork.GetRepository<Member>().GetByIdAsync(Id, ct);
             if(member is null)
             {
-                return false;
+                return Result.NotFound("Member Is Not Found");
             }
 
             var emailExist = await _iUnitOfWork.GetRepository<Member>().AnyAsync(m => m.Email == model.Email && m.Id != Id, ct);
             var phoneExist = await _iUnitOfWork.GetRepository<Member>().AnyAsync(m => m.Phone == model.Phone && m.Id != Id, ct);
-            if(emailExist || phoneExist) 
-            {
-                return false;
-            }
+            if(emailExist )
+                return Result.Validation("This Email Already Exists");
+            if ( phoneExist)
+                return Result.Validation("This Phone Number Already Exists");
+
 
             member.Email = model.Email;
             member.Phone = model.Phone;
@@ -127,21 +132,21 @@ namespace GymSystem.BLL.Services.Classes
             _iUnitOfWork.GetRepository<Member>().UpdateAsync(member);
 
             var result = await _iUnitOfWork.SaveChangesAsync(ct);
-            return result > 0 ;
+            return result > 0 ? Result.OK() : Result.Fail("Failed To Update Member");
          }
 
-        public async Task<bool> RemoveMemberAsync(int Id, CancellationToken ct = default)
+        public async Task<Result> RemoveMemberAsync(int Id, CancellationToken ct = default)
         {
             var member = await _iUnitOfWork.GetRepository<Member>().GetByIdAsync(Id, ct);
             if(member is null)
-                return false;
+                return Result.NotFound("Member Is Not Found");
 
             var futureSessions = await _iUnitOfWork.GetRepository<Booking>().AnyAsync(m => m.MemberId == Id && m.Session.StartTime > DateTime.Now, ct);
             if (futureSessions)
-                return false;
+                return Result.Validation("Can't Delete Member Has A Future Session");
             _iUnitOfWork.GetRepository<Member>().DeleteAsync(member);
             var result = await _iUnitOfWork.SaveChangesAsync(ct);
-            return result > 0;
+            return result > 0 ? Result.OK() : Result.Fail("Failed To Delete Member");
 
         }
     }

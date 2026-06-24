@@ -27,12 +27,6 @@ namespace GymSystem.DAL
 
             #region SEEDING...
 
-            // SEEDING PLANS .....
-            modelBuilder.Entity<Plan>().HasData(
-                new Plan { Id = 1, Name = "Basic Plan", Price = 50, DurationDays = 30, Description = "Access to gym equipment during staffed hours", IsActive = true },
-                new Plan { Id = 2, Name = "Premium Plan", Price = 100, DurationDays = 60, Description = "Access to all gym equipment and classes", IsActive = false }
-            );
-
             // SEEDING CATEGORIES .......
             modelBuilder.Entity<Category> ().HasData(
                 new Category { Id = 1, Name = TrainingType.Strength},

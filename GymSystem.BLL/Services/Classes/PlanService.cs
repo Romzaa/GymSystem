@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using GymSystem.BLL.Helpers;
 using GymSystem.BLL.Services.Interfaces;
 using GymSystem.BLL.ViewModels.PlanViewModels;
 using GymSystem.DAL.Models;
@@ -69,10 +70,10 @@ namespace GymSystem.BLL.Services.Classes
             return result > 0;
         }
 
-        public async Task<bool> UpdatePlanAsync(int Id, UpdatePlanViewModel model, CancellationToken ct = default)
+        public async Task<Result> UpdatePlanAsync(int Id, UpdatePlanViewModel model, CancellationToken ct = default)
         {
             var plan = await _iUnitOfWork.GetRepository<Plan>().GetByIdAsync(Id, ct);
-            if (plan is null || await HasActiveMembershipsAsync(Id , ct)) return false;
+            if (plan is null || await HasActiveMembershipsAsync(Id , ct)) return Result.Validation("Can't Update Plan With Active Memberships");
 
             plan.Name = model.PlanName;
             plan.Description = model.Description;
@@ -82,7 +83,7 @@ namespace GymSystem.BLL.Services.Classes
 
             _iUnitOfWork.GetRepository<Plan>().UpdateAsync(plan);
             var result = await _iUnitOfWork.SaveChangesAsync(ct);
-            return result > 0;
+            return result > 0 ? Result.OK() : Result.Fail("Failed To Update Plan");
 
         }
     }

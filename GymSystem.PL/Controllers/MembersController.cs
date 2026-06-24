@@ -61,13 +61,13 @@ namespace GymSystem.PL.Controllers
             }
             var result = await _memberService.CreateMemberAsync(viewModel, ct);
 
-            if (result)
+            if (result.success)
             {
                 TempData["SuccessMessage"] = "Member created successfully.";
             }
             else
             {
-                TempData["ErrorMessage"] = "Failed to create member. Please try again.";
+                TempData["ErrorMessage"] = result.errorMessage;
             }
 
 
@@ -100,9 +100,9 @@ namespace GymSystem.PL.Controllers
                 return View(model);
             }
         var result =await _memberService.UpdateMemberAsync(Id, model, ct);
-            if(result  == false)
+            if(!result.success)
             {
-                TempData["ErrorMessage"] = "Failed To Update Member";
+                TempData["ErrorMessage"] = result.errorMessage;
                 View(model);
             }
             TempData["SuccessMessage"] = "Member Updated Successfully";
@@ -129,13 +129,13 @@ namespace GymSystem.PL.Controllers
         public async Task<IActionResult> DeleteConfirmed(int Id, CancellationToken ct)
         {
             var result = await _memberService.RemoveMemberAsync(Id, ct);
-            if (result)
+            if (result.success)
             {
                 TempData["SuccessMessage"] = "Member Is Deleted Successfully";
             }
             else
             {
-                TempData["ErrorMessage"] = "Failed To Delete Member";
+                TempData["ErrorMessage"] = result.errorMessage;
             }
             return RedirectToAction(nameof(Index));
 
