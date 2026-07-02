@@ -1,4 +1,5 @@
 ﻿using GymSystem.DAL.Enums;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -8,6 +9,10 @@ namespace GymSystem.BLL.ViewModels.TrainerViewModels
 {
     public class CreateTrainerViewModel
     {
+        [Required(ErrorMessage = "Profile Photo Is Required")]
+        [Display(Name = "Profile Photo")]
+        public IFormFile PhotoFile { get; set; } = default!;
+
         [Required(ErrorMessage ="Name Is Required")]
         [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage ="Name Can Only Contain Letters And Spaces")]
         public string Name { get; set; } = default!;

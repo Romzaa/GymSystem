@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using GymSystem.BLL.Helpers;
+using GymSystem.BLL.Services.AttachementService;
 using GymSystem.BLL.Services.Interfaces;
 using GymSystem.BLL.ViewModels.TrainerViewModels;
 using GymSystem.DAL.Models;
@@ -15,26 +16,40 @@ namespace GymSystem.BLL.Services.Classes
     {
         private readonly IUnitOfWork _iUnitOfWork;
         private readonly IMapper _mapper;
+        private readonly IAttachmentService _attachmentService;
 
-        public TrainerService(IUnitOfWork iUnitOfWork, IMapper mapper) 
+        public TrainerService(IUnitOfWork iUnitOfWork, IMapper mapper, IAttachmentService attachmentService) 
         {
             _iUnitOfWork = iUnitOfWork;
             _mapper = mapper;
+            _attachmentService = attachmentService;
         }
         public async Task<Result> CreateTrainerAsync(CreateTrainerViewModel viewModel, CancellationToken ct = default)
         {
             var trainerRepo = _iUnitOfWork.GetRepository<Trainer>();
 
-            var emailExists =await trainerRepo.AnyAsync(t => t.Email == viewModel.Email);
-            var phoneExists =await trainerRepo.AnyAsync(t => t.Phone == viewModel.Phone);
+            var emailExists = await trainerRepo.AnyAsync(t => t.Email == viewModel.Email);
+            var phoneExists = await trainerRepo.AnyAsync(t => t.Phone == viewModel.Phone);
             if (phoneExists)
                 return Result.Validation("This Phone Already Exists");
             if (emailExists)
                 return Result.Validation("This Email Already Exists");
-            var trainer =  _mapper.Map<Trainer>(viewModel);
+
+            var photo = await _attachmentService.UploadAsync(viewModel.PhotoFile.OpenReadStream(), viewModel.PhotoFile.FileName, "TrainersPitures", ct);
+            if (string.IsNullOrEmpty(photo)) return Result.Fail("Failed To Upload Trainer Profile Photo");
+
+            var trainer = _mapper.Map<Trainer>(viewModel);
+            trainer.Photo = photo;
+
             trainerRepo.AddAsync(trainer);
             var result = await _iUnitOfWork.SaveChangesAsync(ct);
-            return result > 0 ? Result.OK() : Result.Fail("Failed To Create New Trainer");
+            if (result == 0)
+            {
+                _attachmentService.Delete(trainer.Photo, "TrainersPitures");
+                return Result.Fail("Failed To Create New Trainer");
+            }
+            else return Result.OK();
+
         }
 
         public async Task<IEnumerable<TrainerViewModel>> GetAllTrainersAsync(CancellationToken ct = default)
@@ -93,7 +108,13 @@ namespace GymSystem.BLL.Services.Classes
 
             _iUnitOfWork.GetRepository<Trainer>().DeleteAsync(trainer);
             var result = await _iUnitOfWork.SaveChangesAsync(ct);
-            return result > 0 ? Result.OK() : Result.Fail("Failed To Delete Trainer");
+            if( result > 0 )
+            {
+                if (!string.IsNullOrEmpty(trainer.Photo)) 
+                _attachmentService.Delete(trainer.Photo, "TrainersPitures");
+                return Result.OK();
+                
+            } else return Result.Fail("Failed To Delete Trainer");
         }
 
 

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using GymSystem.BLL.Helpers;
+using GymSystem.BLL.Services.AttachementService;
 using GymSystem.BLL.Services.Interfaces;
 using GymSystem.BLL.ViewModels.MemberViewModels;
 using GymSystem.DAL;
@@ -16,11 +17,13 @@ namespace GymSystem.BLL.Services.Classes
     {
         private readonly IUnitOfWork _iUnitOfWork;
         private readonly IMapper _mapper;
+        private readonly IAttachmentService _attachmentService;
 
-        public MemberService(IUnitOfWork IUnitOfWork, IMapper mapper)
+        public MemberService(IUnitOfWork IUnitOfWork, IMapper mapper, IAttachmentService attachmentService)
         {
             _iUnitOfWork = IUnitOfWork;
             _mapper = mapper;
+            _attachmentService = attachmentService;
         }
 
         public async Task<Result> CreateMemberAsync(CreateMemberViewModel viewModel, CancellationToken ct = default)
@@ -34,12 +37,21 @@ namespace GymSystem.BLL.Services.Classes
             if(phoneExists)
                 return Result.Validation("This Phone Number Already Exists");
 
+            var photo = await _attachmentService.UploadAsync(viewModel.PhotoFile.OpenReadStream(), viewModel.PhotoFile.FileName, "MembersPictures", ct);
+            if (string.IsNullOrEmpty(photo)) return Result.Fail("Failed To Upload Member Profile Photo");
+
             var member = _mapper.Map<Member>(viewModel);
+            member.Photo = photo;
              memberRepo.AddAsync(member);
             var result = await _iUnitOfWork.SaveChangesAsync(ct);
-            return result > 0 ? Result.OK() : Result.Fail("Failed To Create New Member");
-            
+            if (result == 0)
+            {
+                _attachmentService.Delete(member.Photo, "MembersPictures");
+                return Result.Fail("Failed To Create New Member");
             }
+            else return Result.OK();
+
+        }
 
 
         public  async Task<IEnumerable<MemberViewModel>> GetAllMembersAsync(CancellationToken ct = default)
@@ -146,7 +158,13 @@ namespace GymSystem.BLL.Services.Classes
                 return Result.Validation("Can't Delete Member Has A Future Session");
             _iUnitOfWork.GetRepository<Member>().DeleteAsync(member);
             var result = await _iUnitOfWork.SaveChangesAsync(ct);
-            return result > 0 ? Result.OK() : Result.Fail("Failed To Delete Member");
+            if (result > 0)
+            {
+                if(!string.IsNullOrEmpty(member.Photo))
+                    _attachmentService.Delete(member.Photo, "MembersPictures");
+                     return Result.OK();
+            }
+            else return Result.Fail("Failed To Remove Member");
 
         }
     }

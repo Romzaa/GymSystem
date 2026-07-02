@@ -15,6 +15,17 @@
                 <div class="card-body p-4">
                     <div class="mb-4 pb-3 border-bottom">
                         <small class="text-muted d-block mb-1">Editing Profile For</small>
+                        <div>
+                            @if (string.IsNullOrEmpty(Model.Photo))
+                            {
+                                <i class="bi bi-person-badge display-4 mb-3"></i>
+                            }
+                            else
+                            {
+                                <img src="@Url.Action("Picture", "Trainers", new { Id = ViewContext.RouteData.Values["Id"] })" alt="@Model.Name" class="rounded-circle"
+                                     style=" width: 120px; height: 120px; object-fit: cover; border: 3px solid #fff;" />
+                            }
+                        </div>
                         <h4 class="mb-0 text-black">@Model.Name</h4>
                     </div>
                     <form asp-action="Edit" method="post">

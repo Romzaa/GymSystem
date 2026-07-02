@@ -7,7 +7,7 @@
         <h3 class="text-primary-color">Add New Trainer</h3>
     </header>
 
-    <form method="post" asp-action="Create">
+    <form method="post" asp-action="Create" enctype="multipart/form-data">
 
         <!-- Trainer Info -->
         <div class="section-header mb-3">
@@ -15,6 +15,17 @@
             <hr class="mt-2">
         </div>
         <div class="row g-3">
+
+            <div class="form-group">
+                <div class="mt-2">
+                    <img id="photoPreview" src="#" alt="Profile Photo" class="img-thumbnail" style="max-width:200px; display:none;"/>
+                </div>
+                <label asp-for="PhotoFile" class="control-label" >Profile Photo <span class="text-danger">*</span></label>
+                <input asp-for="PhotoFile" id="photoInput" accept="image/*" class="form-control" type="file" required/>
+                <span asp-validation-for="PhotoFile" class="text-danger"></span>
+                <small class="text-muted form-text">Max Size: 5MB. Allowed Extensions: JPG, JPEG, PNG</small>
+            </div>
+
             <div class="col-12 col-md-6">
                 <label asp-for="Name" class="form-label"></label>
                 <input asp-for="Name" type="text" class="form-control" />
@@ -96,3 +107,19 @@
 @section Scripts{
     <partial name="_AlertBoxScript" />
 }
+
+<script>
+    // Preview photo before upload
+    document.getElementById('photoInput').addEventListener('change', function (e) {
+    var file = e.target.files[0];
+    if (file) {
+    var reader = new FileReader();
+    reader.onload = function (e) {
+    var preview = document.getElementById('photoPreview');
+    preview.src = e.target.result;
+    preview.style.display = 'block';
+    }
+    reader.readAsDataURL(file);
+    }
+    });
+</script>

@@ -1,4 +1,5 @@
-﻿using GymSystem.BLL.Services.Classes;
+﻿using GymSystem.BLL.Services.AttachementService;
+using GymSystem.BLL.Services.Classes;
 using GymSystem.BLL.Services.Interfaces;
 using GymSystem.BLL.ViewModels.TrainerViewModels;
 using GymSystem.DAL.Models;
@@ -9,10 +10,12 @@ namespace GymSystem.PL.Controllers
     public class TrainersController : Controller
     {
         private readonly ITrainerService _trainerService;
+        private readonly IAttachmentService _attachmentService;
 
-        public TrainersController(ITrainerService trainerService)
+        public TrainersController(ITrainerService trainerService, IAttachmentService attachmentService)
         {
             _trainerService = trainerService;
+            _attachmentService = attachmentService;
         }
 
 
@@ -136,5 +139,20 @@ namespace GymSystem.PL.Controllers
 
 
         #endregion
+
+        public async Task<IActionResult> Picture(int Id)
+        {
+            var trainer = await _trainerService.GetTrainerDetailsAsync(Id);
+            if(trainer is null || string.IsNullOrEmpty(trainer.Photo))
+            return NotFound();
+
+            var result =  _attachmentService.GetFile(trainer.Photo, "TrainersPitures");
+            if(result is null)
+                return NotFound();
+
+         return  File(result.Value.stream , result.Value.contentType);
+
+        }
+
     }
 }

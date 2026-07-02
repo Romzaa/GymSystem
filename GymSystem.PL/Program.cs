@@ -1,4 +1,5 @@
 using GymSystem.BLL.Helpers;
+using GymSystem.BLL.Services.AttachementService;
 using GymSystem.BLL.Services.Classes;
 using GymSystem.BLL.Services.Interfaces;
 using GymSystem.DAL;
@@ -25,6 +26,7 @@ namespace GymSystem.PL
             builder.Services.AddScoped<ITrainerService , TrainerService >();
             builder.Services.AddScoped<ISessionService, SessionService >();
             builder.Services.AddScoped<ISessionRepository, SessionRepository>();
+            builder.Services.AddScoped<IAttachmentService, AttachmentService >();
             builder.Services.AddAutoMapper(opt => opt.AddProfile(new MappingProfile()));
             builder.Services.AddDbContext<GymDbContext>(options =>
             {

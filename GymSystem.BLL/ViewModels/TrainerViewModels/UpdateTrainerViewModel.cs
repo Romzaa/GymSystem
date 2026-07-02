@@ -10,6 +10,8 @@ namespace GymSystem.BLL.ViewModels.TrainerViewModels
     {
 
         public string Name { get; set; } = default!;
+        public string? Photo { get; set; }
+
 
         [Required(ErrorMessage = "Email Is Required")]
         [EmailAddress(ErrorMessage = "Invalid Email Format")]

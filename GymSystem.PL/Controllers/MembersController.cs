@@ -1,4 +1,5 @@
-﻿using GymSystem.BLL.Services.Interfaces;
+﻿using GymSystem.BLL.Services.AttachementService;
+using GymSystem.BLL.Services.Interfaces;
 using GymSystem.BLL.ViewModels.MemberViewModels;
 using GymSystem.DAL;
 using Microsoft.AspNetCore.Mvc;
@@ -8,10 +9,12 @@ namespace GymSystem.PL.Controllers
     public class MembersController : Controller
     {
         private readonly IMemberService _memberService;
+        private readonly IAttachmentService _attachmentService;
 
-        public MembersController(IMemberService memberService)
+        public MembersController(IMemberService memberService, IAttachmentService attachmentService)
         {
             _memberService = memberService;
+            _attachmentService = attachmentService;
         }
 
         public async Task<IActionResult> Index( CancellationToken ct)
@@ -145,7 +148,18 @@ namespace GymSystem.PL.Controllers
         #endregion
 
 
+        public async Task<IActionResult> Picture(int Id)
+        {
+            var member = await _memberService.GetMemberDetailsAsync(Id);
+            if (member is null || string.IsNullOrEmpty(member.Photo))
+                return NotFound();
 
+            var result = _attachmentService.GetFile(member.Photo, "MembersPictures");
+            if (result is null) 
+                return NotFound();
+            return File(result.Value.stream, result.Value.contentType);
+
+        }
 
 
     }

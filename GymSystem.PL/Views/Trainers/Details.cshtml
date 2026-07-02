@@ -5,7 +5,17 @@
         <div class="col-md-6">
             <div class="card shadow-lg border-0">
                 <div class="card-header bg-primary-color text-white text-center py-5">
-                    <i class="bi bi-person-badge display-4 mb-3"></i>
+                    <div>
+                        @if (string.IsNullOrEmpty(Model.Photo))
+                        {
+                            <i class="bi bi-person-badge display-4 mb-3"></i>
+                        }
+                        else
+                        {
+                            <img src="@Url.Action("Picture", "Trainers", new { Id = Model.Id })" alt="@Model.Name" class="rounded-circle"
+                            style=" width: 120px; height: 120px; object-fit: cover; border: 3px solid #fff;" />
+                        }
+                    </div>
                     <h2 class="mb-0">@Model.Name</h2>
                     <span class="badge bg-light text-primary-color mt-2">@Model.Specialities Trainer</span>
                 </div>
