@@ -116,8 +116,12 @@ namespace GymSystem.BLL.Helpers
                 .ForMember(des => des.StartDate, opt => opt.MapFrom(src => src.StartDate.ToShortDateString()));
 
             CreateMap<CreateMembershipViewModel, Membership>();
-            CreateMap<Plan, PlansListViewModel>();
-            CreateMap<Member, MembersListViewModel>();
+            CreateMap<Plan, PlansListViewModel>()
+                .ForMember(des => des.PlanId , opt => opt.MapFrom(src => src.Id))
+                .ForMember(des => des.PlanName , opt => opt.MapFrom(src => src.Name));
+            CreateMap<Member, MembersListViewModel>()
+                .ForMember(des => des.MemberId, opt => opt.MapFrom(src => src.Id))
+                .ForMember(des => des.MemberName, opt => opt.MapFrom(src => src.Name));
         }
 
 

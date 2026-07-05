@@ -18,25 +18,6 @@
             </div>
         </div>
     </header>
-
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div id="Alert" class="alert alert-success alert-dismissible fade show">
-            <i class="bi bi-check-circle-fill me-2"></i>
-            @TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    }
-    else if (TempData["ErrorMessage"] != null)
-    {
-        <div id="Alert" class="alert alert-danger alert-dismissible fade show">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-            @TempData["ErrorMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    }
-
-
     <div class="card">
         <div class="card-body">
             @if (Model.Any())
@@ -63,7 +44,8 @@
                                     <div class="d-flex gap-1">
                                         <form method="post" asp-action="Cancel" class="m-0">
                                             <input type="hidden" name="id" value="@item.MemberId" />
-                                            <button type="submit" class="btn btn-sm btn-danger">
+                                            <button type="submit" class="btn btn-sm btn-danger"
+                                                    onclick="return confirm('Are you sure you want to cancel this membership?');">
                                                 <i class="fas fa-times"></i> Cancel
                                             </button>
                                         </form>
@@ -86,3 +68,8 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <partial name="_AlertBoxScript.cshtml" />
+}

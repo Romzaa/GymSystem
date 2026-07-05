@@ -46,7 +46,7 @@ namespace GymSystem.BLL.Services.Classes
                 return Result.Fail("Member Already Has An Active Membership");
             } 
 
-            var plan = await _unitOfWork.GetRepository<Plan>().FirstOrDefaultAsync(p=> p.Id == model.PlandId, ct:ct);
+            var plan = await _unitOfWork.GetRepository<Plan>().FirstOrDefaultAsync(p=> p.Id == model.PlanId, ct:ct);
             if(plan is null)
             {
                 return Result.Fail("Plan Not Found");
