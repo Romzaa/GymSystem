@@ -18,9 +18,9 @@ namespace GymSystem.DAL.Repositries.Classes
 
         public async Task<IEnumerable<Session>> GetAllSessionswithTrainerandCategory(CancellationToken ct = default)
         {
-            var sessions =  _dbContext.Sessions.Include(s => s.Category).Include(s => s.Trainer);
+            var sessions = await _dbContext.Sessions.Include(s => s.Category).Include(s => s.Trainer).ToListAsync(ct);
 
-            return await sessions.ToListAsync(ct);
+            return  sessions;
         }
         public async Task<Session?> GetSessionwithTrainerandCategoryByIdAsync(int Id, CancellationToken ct = default)
         {

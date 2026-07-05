@@ -1,11 +1,13 @@
 using GymSystem.BLL.Services.Interfaces;
 using GymSystem.DAL;
 using GymSystem.PL.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
 namespace GymSystem.PL.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly IMemberService _memberService;

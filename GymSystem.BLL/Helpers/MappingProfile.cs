@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using GymSystem.BLL.ViewModels.MembershipViewModels;
 using GymSystem.BLL.ViewModels.MemberViewModels;
 using GymSystem.BLL.ViewModels.PlanViewModels;
 using GymSystem.BLL.ViewModels.SessionViewModels;
@@ -18,6 +19,7 @@ namespace GymSystem.BLL.Helpers
             MapPlan();
             MapSession();
             MapTrainer();
+            MapMembership();
         }
 
         private void MapMember()
@@ -105,5 +107,20 @@ namespace GymSystem.BLL.Helpers
                     des.City = src.Address.City;
                 });
         }
+
+        private void MapMembership()
+        {
+            CreateMap<Membership, MembershipViewModel>()
+                .ForMember(des => des.MemberName, opt => opt.MapFrom(src => src.Member.Name))
+                .ForMember(des => des.PlanName, opt => opt.MapFrom(src => src.Plan.Name))
+                .ForMember(des => des.StartDate, opt => opt.MapFrom(src => src.StartDate.ToShortDateString()));
+
+            CreateMap<CreateMembershipViewModel, Membership>();
+            CreateMap<Plan, PlansListViewModel>();
+            CreateMap<Member, MembersListViewModel>();
+        }
+
+
+
     }
 }

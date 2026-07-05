@@ -11,6 +11,8 @@ namespace GymSystem.DAL.Repositries.Interfaces
         Task<int> SaveChangesAsync(CancellationToken ct = default);
 
         ISessionRepository SessionRepository { get; }
+        IMembershipRepository MembershipRepository { get; }
+        IMembershipRepository BookingRepository { get; }
 
     }
 }

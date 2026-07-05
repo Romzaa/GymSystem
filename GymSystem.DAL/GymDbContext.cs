@@ -1,5 +1,6 @@
 ﻿using GymSystem.DAL.Enums;
 using GymSystem.DAL.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Text;
 
 namespace GymSystem.DAL
 {
-    public class GymDbContext : DbContext
+    public class GymDbContext : IdentityDbContext<ApplicationUser>
     {
 
         public GymDbContext( DbContextOptions<GymDbContext> options ) : base( options ) 
@@ -18,12 +19,20 @@ namespace GymSystem.DAL
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.HasSequence<int>("PersonSequence")
                 .StartsAt(1)
                 .IncrementsBy(1);
             modelBuilder.Ignore<Person>();
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
+
+            modelBuilder.Entity<ApplicationUser>(etb =>
+            {
+                etb.Property(u => u.FirstName).HasMaxLength(50);
+                etb.Property(u => u.LastName).HasMaxLength(50);
+            });
 
             #region SEEDING...
 
@@ -42,6 +51,7 @@ namespace GymSystem.DAL
 
         public DbSet<Member> Members { get; set; }
         public DbSet<Membership> Memberships { get; set; }
+        public DbSet<Booking> Bookings { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Trainer> Trainers { get; set; }
         public DbSet<Plan> Plans { get; set; }

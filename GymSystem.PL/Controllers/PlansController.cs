@@ -3,9 +3,11 @@ using GymSystem.BLL.ViewModels.PlanViewModels;
 using GymSystem.DAL.Models;
 using GymSystem.DAL.Repositries.Classes;
 using GymSystem.DAL.Repositries.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace GymSystem.PL.Controllers
 {
+    [Authorize]
     public class PlansController : Controller
     {
         private readonly IPlanService _planService;

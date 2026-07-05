@@ -3,10 +3,12 @@ using GymSystem.BLL.Services.Classes;
 using GymSystem.BLL.Services.Interfaces;
 using GymSystem.BLL.ViewModels.TrainerViewModels;
 using GymSystem.DAL.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GymSystem.PL.Controllers
 {
+    [Authorize(Roles = "SuperAdmin")]
     public class TrainersController : Controller
     {
         private readonly ITrainerService _trainerService;
@@ -153,6 +155,8 @@ namespace GymSystem.PL.Controllers
          return  File(result.Value.stream , result.Value.contentType);
 
         }
+
+
 
     }
 }
