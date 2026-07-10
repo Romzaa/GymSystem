@@ -12,7 +12,7 @@ namespace GymSystem.DAL.Repositries.Interfaces
 
         ISessionRepository SessionRepository { get; }
         IMembershipRepository MembershipRepository { get; }
-        IMembershipRepository BookingRepository { get; }
+        IBookingRepository BookingRepository { get; }
 
     }
 }

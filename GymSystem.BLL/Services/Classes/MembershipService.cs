@@ -63,7 +63,7 @@ namespace GymSystem.BLL.Services.Classes
 
         public async Task<Result> DeleteActiveMembershipAsync(int Id, CancellationToken ct = default)
         {
-            var member = await _unitOfWork.MembershipRepository.FirstOrDefaultAsync(m => m.Id == Id && m.EndDate > DateTime.Now,true, ct);
+            var member = await _unitOfWork.MembershipRepository.FirstOrDefaultAsync(m => m.MemberId == Id && m.EndDate > DateTime.Now,true, ct);
             if (member is null)
             {
                 return Result.Fail("This Member Doesn't Have Active Membership");
@@ -78,14 +78,14 @@ namespace GymSystem.BLL.Services.Classes
 
         public  async Task<IEnumerable<MembersListViewModel>> GetMembersListAsync(CancellationToken ct = default)
         {
-            var members = await _unitOfWork.GetRepository<Member>().GetAllAsync(ct: ct);
+            var members = await _unitOfWork.GetRepository<Member>().GetAllAsync(null,ct: ct);
             return _mapper.Map<IEnumerable<MembersListViewModel>>(members);
             
         }
 
         public async Task<IEnumerable<PlansListViewModel>> GetPlansListAsync(CancellationToken ct = default)
         {
-            var plans = await _unitOfWork.GetRepository<Plan>().GetAllAsync(ct: ct);
+            var plans = await _unitOfWork.GetRepository<Plan>().GetAllAsync(null,ct: ct);
             return _mapper.Map<IEnumerable<PlansListViewModel>>(plans);
         }
 

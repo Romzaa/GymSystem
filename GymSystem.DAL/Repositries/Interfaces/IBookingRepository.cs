@@ -6,7 +6,7 @@ using System.Text;
 
 namespace GymSystem.DAL.Repositries.Interfaces
 {
-    public interface IBookingsRepository : IGenericRepository<Booking>
+    public interface IBookingRepository : IGenericRepository<Booking>
     {
         Task<IEnumerable<Booking>> GetAllBookingsWithMembersAndSessions(Expression<Func<Booking, bool>> filter ,CancellationToken ct = default);
         Task<Booking?> GetBookingWithMemberAndSession(int Id, CancellationToken ct = default);

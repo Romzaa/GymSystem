@@ -14,8 +14,12 @@ namespace GymSystem.DAL.Configurations
             builder.ToTable(s => {
                 s.HasCheckConstraint("CK_Session_Capicity", "Capacity between 1 and 25");
                 s.HasCheckConstraint("CK_Session_Date", "StartTime < EndTime");
+                
             }
             );
+
+            builder.Property(s => s.UpdatedAt)
+                .HasDefaultValueSql("GETUTCDATE()");
 
         }
     }

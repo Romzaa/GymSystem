@@ -15,10 +15,10 @@ namespace GymSystem.DAL.Repositries.Classes
 
         public IMembershipRepository MembershipRepository { get; }
 
-        public IMembershipRepository BookingRepository { get; }
+        public IBookingRepository BookingRepository { get; }
 
         public UnitOfWork(GymDbContext dbContext, ISessionRepository sessionRepo,
-                           IMembershipRepository membershipRepository, IMembershipRepository bookingRepository)
+                           IMembershipRepository membershipRepository, IBookingRepository bookingRepository)
         {
             _dbContext = dbContext;
             SessionRepository = sessionRepo;

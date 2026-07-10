@@ -1,4 +1,5 @@
 using GymSystem.BLL.Helpers;
+using GymSystem.BLL.Services.AnalyticsService;
 using GymSystem.BLL.Services.AttachementService;
 using GymSystem.BLL.Services.Classes;
 using GymSystem.BLL.Services.Interfaces;
@@ -33,10 +34,12 @@ namespace GymSystem.PL
             builder.Services.AddScoped<ITrainerService , TrainerService >();
             builder.Services.AddScoped<ISessionService, SessionService >();
             builder.Services.AddScoped<IMembershipService, MembershipService>();
+            builder.Services.AddScoped<IBookingService, BookingService>();
             builder.Services.AddScoped<ISessionRepository, SessionRepository>();
             builder.Services.AddScoped<IMembershipRepository, MembershipRepository >();
-            builder.Services.AddScoped<IBookingsRepository, BookingRepository>();
+            builder.Services.AddScoped<IBookingRepository, BookingRepository>();
             builder.Services.AddScoped<IAttachmentService, AttachmentService >();
+            builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
             builder.Services.AddAutoMapper(opt => opt.AddProfile(new MappingProfile()));
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>(config =>
             {

@@ -22,7 +22,7 @@ namespace GymSystem.BLL.Services.Classes
         }
         public async Task<IEnumerable<PlanViewModel>> GetAllPlansAsync(CancellationToken ct = default)
         {
-            var plans = await _iUnitOfWork.GetRepository<Plan>().GetAllAsync(ct: ct);
+            var plans = await _iUnitOfWork.GetRepository<Plan>().GetAllAsync(null, ct: ct);
             if (plans is null)
                 return [];
             return _mapper.Map<IEnumerable<PlanViewModel>>(plans);

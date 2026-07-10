@@ -23,7 +23,7 @@ namespace GymSystem.BLL.Services.Classes
         }
         public async Task<IEnumerable<SessionViewModel>> GetAllSessionsAsync(CancellationToken ct = default)
         {
-            var sessions = await _iUnitOfWork.SessionRepository.GetAllSessionswithTrainerandCategory(ct);
+            var sessions = await _iUnitOfWork.SessionRepository.GetAllSessionswithTrainerandCategory(null,ct);
             if (sessions is null)
                 return [];
             return _Mapper.Map<IEnumerable<SessionViewModel>>(sessions.OrderByDescending(s => s.StartTime));
@@ -43,8 +43,8 @@ namespace GymSystem.BLL.Services.Classes
             var trainerRepo = _iUnitOfWork.GetRepository<Trainer>();
             var trainer = await trainerRepo.GetByIdAsync(model.TrainerId);
             if (model is null) return Result.NotFound();
-            if(model.StartTime > model.EndTime) return Result.Validation("Error!! End-Date Must Be After Start-Date");
-            if( model.StartTime < DateTime.Now ) return Result.Validation("Error!! Start-Date Must Be In The Future");
+            if(model.StartTime >= model.EndTime) return Result.Validation("Error!! End-Date Must Be After Start-Date");
+            if( model.StartTime <= DateTime.Now ) return Result.Validation("Error!! Start-Date Must Be In The Future");
             if (trainer is null) return Result.NotFound("Trainer Is Not Found");
             if( await _iUnitOfWork.SessionRepository.AnyAsync(
                     s => (
@@ -121,7 +121,7 @@ namespace GymSystem.BLL.Services.Classes
 
         public async Task<IEnumerable<Trainer>> GetAllTrainers(CancellationToken ct = default)
         {
-            var Trainers = await _iUnitOfWork.GetRepository<Trainer>().GetAllAsync(ct:ct);
+            var Trainers = await _iUnitOfWork.GetRepository<Trainer>().GetAllAsync(null, ct:ct);
             return Trainers.ToList();
         }
 

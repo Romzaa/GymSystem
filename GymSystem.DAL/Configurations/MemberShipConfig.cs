@@ -13,6 +13,8 @@ namespace GymSystem.DAL.Configurations
         {
             builder.HasKey(ms => ms.Id);
             builder.Property(ms => ms.StartDate).HasDefaultValueSql("GetDate()");
+            builder.Property(ms => ms.UpdatedAt)
+                .HasDefaultValueSql("GETUTCDATE()");
         }
     }
 }

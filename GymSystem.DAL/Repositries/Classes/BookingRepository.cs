@@ -8,7 +8,7 @@ using System.Text;
 
 namespace GymSystem.DAL.Repositries.Classes
 {
-    public class BookingRepository : GenericRepository<Booking>, IBookingsRepository
+    public class BookingRepository : GenericRepository<Booking>, IBookingRepository
     {
         private readonly GymDbContext _dbContext;
 
@@ -19,8 +19,8 @@ namespace GymSystem.DAL.Repositries.Classes
 
         public async Task<IEnumerable<Booking>> GetAllBookingsWithMembersAndSessions(Expression<Func<Booking, bool>> filter, CancellationToken ct = default)
         {
-            IQueryable<Booking> bookings =  _dbContext.Bookings.Include(b => b.Member).Include(b => b.Session);
-                if(filter is not null)
+            IQueryable<Booking> bookings = _dbContext.Bookings.Include(b => b.Member).Include(b => b.Session);
+            if (filter is not null)
             {
                 bookings = bookings.Where(filter);
             }

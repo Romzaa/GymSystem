@@ -56,7 +56,7 @@ namespace GymSystem.BLL.Services.Classes
 
         public  async Task<IEnumerable<MemberViewModel>> GetAllMembersAsync(CancellationToken ct = default)
         {
-            var members = await _iUnitOfWork.GetRepository<Member>().GetAllAsync(ct:ct);
+            var members = await _iUnitOfWork.GetRepository<Member>().GetAllAsync(null!,ct:ct);
             if (!members.Any())
                 return [];
             return _mapper.Map<IEnumerable<MemberViewModel>>(members);
@@ -83,7 +83,7 @@ namespace GymSystem.BLL.Services.Classes
                 return null;
             var memberViewModel = _mapper.Map<MemberViewModel>(member);
 
-            var membership =await _iUnitOfWork.GetRepository<Membership>().FirstOrDefaultAsync((m => m.Id == Id && m.EndDate > DateTime.Now) , false , ct);
+            var membership =await _iUnitOfWork.GetRepository<Membership>().FirstOrDefaultAsync((m => m.MemberId == Id ) , false , ct);
 
             if(membership is not null)
             {
@@ -91,7 +91,6 @@ namespace GymSystem.BLL.Services.Classes
                 memberViewModel.PlanName = plan?.Name!;
                 memberViewModel.MembershipStartDate = membership.StartDate.ToShortDateString();
                 memberViewModel.MembershipEndDate = membership.EndDate.ToShortDateString();
-
             }
 
             return memberViewModel;

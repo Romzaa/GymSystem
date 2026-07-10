@@ -1,4 +1,4 @@
-using GymSystem.BLL.Services.Interfaces;
+using GymSystem.BLL.Services.AnalyticsService;
 using GymSystem.DAL;
 using GymSystem.PL.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -10,19 +10,21 @@ namespace GymSystem.PL.Controllers
     [Authorize]
     public class HomeController : Controller
     {
-        private readonly IMemberService _memberService;
-        private readonly GymDbContext _dbContext;
-        public HomeController(IMemberService memberService , GymDbContext gymDbContext)
+        private readonly IAnalyticsService _analyticsService;
+
+        public HomeController(IAnalyticsService analyticsService)
         {
-            _memberService = memberService;
-            _dbContext = gymDbContext;
+            _analyticsService = analyticsService;
         }
 
         public async Task<IActionResult> Index(CancellationToken ct)
         {
-            ViewBag.MembersCount = _memberService.GetTotalMembersAsync(_dbContext, ct);
-            ViewBag.ActiveMembers = await _memberService.GetActiveMembersAsync(_dbContext, ct);
-        
+            ViewBag.MembersCount = await _analyticsService.GetTotalMembersAsync( ct);
+            ViewBag.ActiveMembers = await _analyticsService.GetActiveMembersAsync(ct);
+            ViewBag.TrainersCount = await _analyticsService.GetTotalTrainersAsync(ct);
+            ViewBag.UpcomingSessions = await _analyticsService.GetUpcomingSessionsAsync(ct);
+            ViewBag.OngoingSessions = await _analyticsService.GetOngoingSessionsAssync(ct);
+            ViewBag.CompletedSessions = await _analyticsService.GetCompletedSessionsAsync(ct);
             return View();
 
         }

@@ -20,15 +20,21 @@ namespace GymSystem.DAL.Repositries.Classes
 
         // Cann't Use ( Include ) Method Here Because We Don't Know The Type Of T..
         // Only The Specific Repository Can Use It
-        public async Task<IEnumerable<T>> GetAllAsync(bool tracking = false, CancellationToken ct = default)
-        {
-            var Entities = tracking ? _dbSet.ToListAsync(ct) : _dbSet.AsNoTracking().ToListAsync(ct);
-            return await Entities;
+            public  async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T,bool>>? filter,bool tracking = false, CancellationToken ct = default)
+            {
+                IQueryable<T> query = tracking ? _dbSet : _dbSet.AsNoTracking();
+                if(filter is not null)
+            {
+                query = query.Where(filter);
+
+            }
+            return await query.ToListAsync(ct);
+
         }
 
         public async Task<T?> GetByIdAsync(int id, CancellationToken ct = default)
         {
-            var Entity = _dbSet.FindAsync(id, ct);
+                        var Entity = _dbSet.FindAsync(id, ct);
             return await Entity;
         }
         public void AddAsync(T Entity)
